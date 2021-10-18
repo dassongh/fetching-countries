@@ -63,6 +63,6 @@ function appendInfo([ country ]) {
 
 function onError() {
   refs.list.innerHTML = '';
-      refs.info.innerHTML = '';
-      Notify.failure("Oops, there is no country with that name")
+  refs.info.innerHTML = '';
+  Notify.failure("Oops, there is no country with that name")
 }
