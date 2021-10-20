@@ -15,21 +15,21 @@ refs.input.addEventListener('input', debounce(() => {
   
   fetchCountries(value)
     .then(countries => {
+      if (countries.length > 10) {
+        clearInnerHtml()
+        return Notify.info('Too many matches found. Please enter a more specific name.');
+      }
+
       if (value === '') Notify.info('Type something (=')
 
       if (countries.length === 1) {
         if (refs.info.innerHTML !== '') return;
-        refs.list.innerHTML = '';
+        clearInnerHtml()
         appendInfo(countries);
-      } else if (countries.length > 10) {
-        refs.list.innerHTML = '';
-        refs.info.innerHTML = '';
-        Notify.info('Too many matches found. Please enter a more specific name.');
       } else {
-        refs.info.innerHTML = '';
+        clearInnerHtml()
         appendList(countries);
       } 
-      
     })
     .catch(onError);
 
@@ -47,7 +47,10 @@ function appendList(countries) {
 }
 
 function appendInfo([ country ]) {
-  const lang = Object.values(country.languages);
+  const lang = Object.values(country.languages).reduce((acc, el, indx, arr) => {
+    if (arr[arr.length - 1] !== el) return acc += `${el}, `;
+    return acc += `${el}`;
+  }, '');
   const markup = `<div class="country-head">
                     <img src="${country.flags.png}" alt="country flag">
                     <p>${country.name.common}</p>
@@ -62,7 +65,11 @@ function appendInfo([ country ]) {
 }
 
 function onError() {
-  refs.list.innerHTML = '';
-  refs.info.innerHTML = '';
+  clearInnerHtml()
   Notify.failure("Oops, there is no country with that name")
+}
+
+function clearInnerHtml() {
+  refs.info.innerHTML = '';
+  refs.list.innerHTML = '';
 }
